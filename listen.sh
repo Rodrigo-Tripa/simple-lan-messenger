@@ -3,9 +3,9 @@
 # Name: Simple LAN Chat
 # Author: Rodrigo-Tripa (GitHub)
 # Description: Peer-to-peer minimalist chat for local networks.
-# Version: 0.3.5
+# Version: 0.4.0
 
-VERSION="0.3.5"
+VERSION="0.4.0"
 PORT=5000
 LOG_FILE="chat_history_$(date +%Y%m%d_%H%M%S).log"
 ENABLE_LOGGING=false
@@ -113,9 +113,12 @@ if [ "$PORT" != "5000" ]; then
     echo -e "    ${CYAN}./connect.sh $LOCAL_IP -p $PORT${NC}"
 fi
 echo ""
-echo -e "${YELLOW}[*]${NC} Press ${RED}Ctrl+C${NC} to stop server"
+echo -e "${YELLOW}[*]${NC} Press ${RED}Ctrl+C${NC} to stop server or type ${RED}/quit${NC} to exit"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
+
+echo -n "Enter your username: "
+read -r USERNAME
 
 # Cleanup function for graceful exit
 cleanup() {
@@ -135,11 +138,37 @@ if [ "$ENABLE_LOGGING" = true ]; then
         echo "=== Chat Session Started ==="
         echo "Date: $(date)"
         echo "Port: $PORT"
+        echo "Username: $USERNAME"
         echo "============================="
         echo ""
     } > "$LOG_FILE"
-
-    nc -lnv "$PORT" | tee -a "$LOG_FILE"
-else
-    nc -lnv "$PORT"
 fi
+
+FIFO="/tmp/chat_fifo_listen_$$"
+mkfifo "$FIFO"
+nc -lnv "$PORT" < "$FIFO" | (
+    while read -r line; do
+        echo "$line"
+        if [ "$ENABLE_LOGGING" = true ]; then
+            echo "$line" >> "$LOG_FILE"
+        fi
+    done
+) &
+NC_PID=$!
+
+echo "[$USERNAME is now listening]" > "$FIFO"
+
+while read -r line; do
+    if [ "$line" = "/quit" ]; then
+        echo "[$USERNAME stopped listening]" > "$FIFO"
+        break
+    fi
+    timestamp=$(date +%H:%M:%S)
+    echo "[$timestamp] $USERNAME: $line" > "$FIFO"
+    if [ "$ENABLE_LOGGING" = true ]; then
+        echo "[$timestamp] $USERNAME: $line" >> "$LOG_FILE"
+    fi
+done
+
+wait $NC_PID
+rm "$FIFO"

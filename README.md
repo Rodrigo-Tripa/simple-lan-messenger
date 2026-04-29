@@ -1,6 +1,6 @@
 # Simple LAN Chat
 
-![Version](https://img.shields.io/badge/version-0.3.5-blue)
+![Version](https://img.shields.io/badge/version-0.4.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Platform](https://img.shields.io/badge/platform-Linux-lightgrey)
 
@@ -30,6 +30,10 @@ Peer-to-peer minimalist chat for local networks. Zero configuration, zero extra 
 - **Automatic local IP detection**
 - **Complete help menu** (`-h`)
 - **Robust error handling**
+- **Username support** with custom nicknames
+- **Timestamps** on all messages
+- **Graceful exit** with /quit command
+- **Enhanced logging** including sent messages
 
 ---
 
@@ -139,6 +143,13 @@ sudo ufw delete allow 5000
 ---
 
 ## 📝 Changelog
+
+### v0.4.0 (2026-04-29)
+- ✨ Added username support with prompts
+- ✨ Added timestamps to messages
+- ✨ Added /quit command to exit gracefully
+- ✨ Improved logging to include sent messages
+- ✨ Updated to version 0.4.0
 
 ### v0.3.5 (2026-04-28)
 - ✨ Updated to version 0.3.5

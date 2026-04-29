@@ -3,9 +3,9 @@
 # Name: Simple LAN Chat
 # Author: Rodrigo-Tripa (GitHub)
 # Description: Peer-to-peer minimalist chat for local networks.
-# Version: 0.3.5
+# Version: 0.4.0
 
-VERSION="0.3.5"
+VERSION="0.4.0"
 PORT=5000
 TARGET_IP=""
 LOG_FILE="chat_history_$(date +%Y%m%d_%H%M%S).log"
@@ -170,11 +170,37 @@ if [ "$ENABLE_LOGGING" = true ]; then
         echo "=== Chat Session Started ==="
         echo "Date: $(date)"
         echo "Target: $TARGET_IP:$PORT"
+        echo "Username: $USERNAME"
         echo "============================="
         echo ""
     } > "$LOG_FILE"
-
-    nc -nv "$TARGET_IP" "$PORT" | tee -a "$LOG_FILE"
-else
-    nc -nv "$TARGET_IP" "$PORT"
 fi
+
+FIFO="/tmp/chat_fifo_connect_$$"
+mkfifo "$FIFO"
+nc -nv "$TARGET_IP" "$PORT" < "$FIFO" | (
+    while read -r line; do
+        echo "$line"
+        if [ "$ENABLE_LOGGING" = true ]; then
+            echo "$line" >> "$LOG_FILE"
+        fi
+    done
+) &
+NC_PID=$!
+
+echo "[$USERNAME joined the chat]" > "$FIFO"
+
+while read -r line; do
+    if [ "$line" = "/quit" ]; then
+        echo "[$USERNAME left the chat]" > "$FIFO"
+        break
+    fi
+    timestamp=$(date +%H:%M:%S)
+    echo "[$timestamp] $USERNAME: $line" > "$FIFO"
+    if [ "$ENABLE_LOGGING" = true ]; then
+        echo "[$timestamp] $USERNAME: $line" >> "$LOG_FILE"
+    fi
+done
+
+wait $NC_PID
+rm "$FIFO"
