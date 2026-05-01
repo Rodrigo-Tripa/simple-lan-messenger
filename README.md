@@ -140,36 +140,6 @@ sudo ufw allow from 192.168.1.0/24 to any port 5000
 sudo ufw delete allow 5000
 ```
 
----
-
-## 📝 Changelog
-
-### v0.4.0 (2026-04-29)
-- ✨ Added username support with prompts
-- ✨ Added timestamps to messages
-- ✨ Added /quit command to exit gracefully
-- ✨ Improved logging to include sent messages
-- ✨ Updated to version 0.4.0
-
-### v0.3.5 (2026-04-28)
-- ✨ Updated to version 0.3.5
-- ✨ Translated everything to English
-- ✨ Updated author to Rodrigo-Tripa
-
-### v0.2.0 (2026-04-28)
-- ✨ Colorful interface with banner
-- ✨ IP and port validation
-- ✨ Automatic connectivity test
-- ✨ Optional conversation logging
-- ✨ Automatic local IP detection
-- ✨ Help menu (`-h`)
-- ✨ Improved error handling
-- 🐛 Fixed port in use issue
-
-### v0.1.0 (2026-04-20)
-- 🎉 Initial release
-
----
 
 ## 📄 License
 
